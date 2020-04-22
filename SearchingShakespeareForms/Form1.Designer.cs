@@ -55,8 +55,8 @@ namespace SearchingShakespeareForms
                 // TODO: Change this to your own file path
 
                 var text = File.ReadAllText(
-                    @"D:\Github\Algorithms\SearchingShakespeare\shakespeare-complete-works.txt");
-                text = Regex.Replace(text, "\\s+", " ", RegexOptions.Multiline);
+                        @"D:\Github\Algorithms\SearchingShakespeare\shakespeare-complete-works.txt").Replace("\\n", " ")
+                    .Replace("\\r", " ");
                 this._suffixTree = new SuffixTree(text);
                 this._textBox.Text = "Enter text here...";
                 this._textBox.Enabled = true;
