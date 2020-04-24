@@ -22,7 +22,7 @@ namespace SearchingShakespeare
         }
 
 
-        public void Add(Key key, int value)
+        public virtual void Add(Key key, int value)
         {
             if (More is null)
             {
@@ -93,7 +93,7 @@ namespace SearchingShakespeare
                             return node;
                         }
 
-                        var newCurrKey = new Key(key.WordKey, currKey.StartIndex + matchingChars, key.LastIndex);
+                        var newCurrKey = new Key(key.WordKey, currKey.StartIndex + matchingChars, key.LastIndex, key.lowerWord);
 
                         // Look through the LinkedNode Next More nodes to find a matching key
                         var tmp = ln.Next;

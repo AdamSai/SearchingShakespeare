@@ -11,20 +11,22 @@ namespace SearchingShakespeare
         public int Length => LastIndex - StartIndex + 1;
         private char charStart;
         private char charEnd;
+        public string lowerWord;
 
-        public Key(string wordKey, int startIndex, int lastIndex)
+        public Key(string wordKey, int startIndex, int lastIndex, string lowerWord)
         {
             WordKey = wordKey;
             StartIndex = startIndex;
             LastIndex = lastIndex;
             charStart = WordKey[StartIndex];
             charEnd = WordKey[LastIndex];
+            this.lowerWord = lowerWord;
         }
 
         public int CompareTo(Key other)
         {
-            var originalChar = char.ToLower(WordKey[StartIndex]);
-            var otherChar = char.ToLower(other.WordKey[other.StartIndex]);
+            var originalChar = (lowerWord[StartIndex]);
+            var otherChar = (other.lowerWord[other.StartIndex]);
             if (originalChar > otherChar) return 1;
             if (originalChar < otherChar) return -1;
             return 0;
@@ -32,8 +34,8 @@ namespace SearchingShakespeare
 
         public bool StartsWithSameCharacter(Key other)
         {
-            var originalChar = char.ToLower(WordKey[StartIndex]);
-            var otherChar = char.ToLower(other.WordKey[other.StartIndex]);
+            var originalChar = (lowerWord[StartIndex]);
+            var otherChar = (other.lowerWord[other.StartIndex]);
             return originalChar == otherChar;
         }
 
@@ -45,7 +47,7 @@ namespace SearchingShakespeare
 
             for (var i = 0; i < shortest; i++)
             {
-                if (char.ToLower(WordKey[StartIndex + i]) == char.ToLower(other.WordKey[other.StartIndex + i]))
+                if ((lowerWord[StartIndex + i]) == (other.lowerWord[other.StartIndex + i]))
                 {
                     ++matchingChars;
                     continue;
@@ -58,8 +60,8 @@ namespace SearchingShakespeare
 
         public override string ToString()
         {
-            var d = WordKey[StartIndex];
-            d = WordKey[LastIndex];
+            var d = lowerWord[StartIndex];
+            d = lowerWord[LastIndex];
 
             return $"Start: [{StartIndex:N0}] '{WordKey[StartIndex]}' Last: [{LastIndex}] '{WordKey[LastIndex]}'";
         }

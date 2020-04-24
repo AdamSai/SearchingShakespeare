@@ -8,7 +8,7 @@ namespace SearchingShakespeare
         private Node root;
         public bool HasLoadedText { get; private set; } = false;
 
-        public SuffixTree(string text)
+        public SuffixTree(string text, string lowerWord)
         {
             // We only use the root node to search and insert values. It does not require any
             // values itself.
@@ -16,7 +16,7 @@ namespace SearchingShakespeare
             for (var i = 0; i < text.Length; i++)
             {
                 if (text[i] == '\n' || text[i] == '\r') continue;
-                root.Add(new Key(text, i, text.Length - 1), i);
+                root.Add(new Key(text, i, text.Length - 1, lowerWord), i);
             }
 
             HasLoadedText = true;
@@ -24,7 +24,7 @@ namespace SearchingShakespeare
 
         public List<string> Search(string searchString, int resultsMax = 20)
         {
-            var searchKey = new Key(searchString, 0, searchString.Length - 1);
+            var searchKey = new Key(searchString, 0, searchString.Length - 1, searchString.ToLower());
             var resultRoot = root.Locate(searchKey);
             List<string> results;
             if (resultRoot == null)

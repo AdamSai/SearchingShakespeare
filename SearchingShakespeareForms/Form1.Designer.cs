@@ -55,9 +55,10 @@ namespace SearchingShakespeareForms
                 // TODO: Change this to your own file path
 
                 var text = File.ReadAllText(
-                        @"D:\Github\Algorithms\SearchingShakespeare\shakespeare-complete-works.txt").Replace("\\n", " ")
-                    .Replace("\\r", " ");
-                this._suffixTree = new SuffixTree(text);
+                    @"D:\Github\Algorithms\SearchingShakespeare\shakespeare-complete-works.txt") + "$";
+                text = Regex.Replace(text, @"\s+", " ");
+                var lower = text.ToLower();
+                this._suffixTree = new SuffixTree(text, lower);
                 this._textBox.Text = "Enter text here...";
                 this._textBox.Enabled = true;
                 Cursor.Current = Cursors.Default;
@@ -96,6 +97,7 @@ namespace SearchingShakespeareForms
 
         private void TextBox_TextChanged(object sender, EventArgs e)
         {
+            var count = 0;
             if (this._suffixTree is null) return;
             _searchResults.Clear();
             this._resultTextBox.Text = "";
@@ -107,7 +109,7 @@ namespace SearchingShakespeareForms
 
             foreach (var searchResult in _searchResults)
             {
-                this._resultTextBox.Text += searchResult + "\r\n";
+                this._resultTextBox.Text += $"[{++count}] {searchResult}\r\n";
             }
         }
 

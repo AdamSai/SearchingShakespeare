@@ -8,7 +8,7 @@ using static SearchingShakespeare.Utility;
 
 namespace SearchingShakespeare
 {
-    public class LinkedNode : Node
+     public class LinkedNode : Node
     {
         // Node to represent the continuation of the suffix
         protected internal Node Next;
@@ -19,53 +19,40 @@ namespace SearchingShakespeare
         }
 
         //Original value is set when calling this method from a KeyNode, to not lose the value.
-        public void Add(Key key, int value, int originalValue = -1)
+        public override void Add(Key key, int value)
         {
             var matchingChars = key.CountMatchingCharacters(Key);
             var newKeyStartIndex = MathClamp(key.StartIndex + matchingChars, key.StartIndex, key.LastIndex);
             // The new key we want to insert is either the full string or a substring. Subtracting the matching characters of the already
             // existing node, and beginning the new string where the match ends.
-            var newKey = new Key(key.WordKey, newKeyStartIndex, key.LastIndex);
-
-            // Create a new Next key, and add the newly inserted key as a More node.
-            if (Next is null)
+            var newKey = new Key(key.WordKey, newKeyStartIndex, key.LastIndex, key.lowerWord);
+            
+            if (Key.Length == 1 && newKey.Length == 1 && Key.StartsWithSameCharacter(newKey))
             {
-                // If the substring matches the entire key, just add a Next node.
-                if (Key.Length == matchingChars)
+                if (More is null)
                 {
                     More = new KeyNode(newKey, value);
-                    Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
+                    return;
                 }
-                // Else create two new key nodes. One with the continuation of the current key as the Next node
-                // and one with the continuation of the new key as the Next.More node.
-                else
+
+                var temp = More;
+                var prev = (Node) this;
+
+                while (temp != null)
                 {
-                    var nextStartIndex = MathClamp(Key.StartIndex + matchingChars, Key.StartIndex, Key.LastIndex);
-                    var nextKey = new Key(Key.WordKey, nextStartIndex, Key.LastIndex);
-                    // Next = new KeyNode(nextKey, nextStartIndex)
-                    Next = new KeyNode(nextKey, originalValue)
-                    {
-                        More = new KeyNode(newKey, value)
-                    };
-                    Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
+                    prev = temp;
+                    temp = temp.More;
                 }
+
+                if (temp != null) return;
+
+                prev.More = new KeyNode(newKey, value);
             }
             else
             {
-                if (Key.Length > 1)
-                {
-                    Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
-                    var newNextKey = new Key(Key.WordKey,
-                        MathClamp(Key.StartIndex + matchingChars, Key.StartIndex, Key.LastIndex), Key.LastIndex);
-                    var tmp = Next;
-                    Next = new LinkedNode(newNextKey)
-                    {
-                        Next = tmp
-                    };
-                }
-
                 if (Next.Key.StartsWithSameCharacter(newKey))
                 {
+                    Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
                     if (Next is LinkedNode linkedNode)
                     {
                         linkedNode.Add(newKey, value);
@@ -74,11 +61,15 @@ namespace SearchingShakespeare
                     {
                         Next = keyNode.Add(newKey, value);
                     }
+                    
                     return;
                 }
 
                 if (Next.More is null)
+                {
+                    Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
                     Next.More = new KeyNode(newKey, value);
+                }
                 else
                 {
                     var temp = Next.More;
@@ -87,6 +78,7 @@ namespace SearchingShakespeare
                     {
                         if (temp.Key.StartsWithSameCharacter(newKey))
                         {
+                            Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
                             if (temp is LinkedNode linkedNode)
                             {
                                 linkedNode.Add(newKey, value);
@@ -95,16 +87,17 @@ namespace SearchingShakespeare
                             {
                                 prev.More = keyNode.Add(newKey, value);
                             }
+
                             return;
                         }
+
                         prev = temp;
                         temp = temp.More;
                     }
 
-                    if (temp == null)
-                    {
-                        prev.More = new KeyNode(newKey, value);
-                    }
+                    if (temp != null) return;
+                    Key.LastIndex = MathClamp(Key.StartIndex + matchingChars - 1, Key.StartIndex, Key.LastIndex);
+                    prev.More = new KeyNode(newKey, value);
                 }
             }
         }
